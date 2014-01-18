@@ -1,0 +1,11 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libsynocracy
+Description: Synocracy implementation in C
+Version: 1.0.0
+Requires: libczmq
+Libs: -L${libdir} -lsynocracy
+Cflags: -I${includedir}

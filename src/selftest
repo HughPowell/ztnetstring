@@ -1,0 +1,23 @@
+#! /bin/bash
+#
+#   Run selftests and check memory
+
+#   Valgrind command
+VG="valgrind --tool=memcheck --leak-check=full --show-reachable=yes --suppressions=valgrind.supp"
+
+gcc -g -o synocracy_selftest synocracy_selftest.c  \
+    myp_mystatefulmod.c \
+    myp_mystatelessmod.c \
+    ${CFLAGS} ${LDFLAGS} -DHAVE_CONFIG_H -lczmq -lzmq -lcrypto
+
+if [ $? -eq 0 ]; then
+    if [ "$1" == "-q" ]; then
+        ./synocracy_selftest
+        exit
+    else
+        $VG ./synocracy_selftest
+    fi
+fi
+rm -f vgcore.*
+
+[ "$1" == "quick" ] && exit
