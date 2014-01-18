@@ -40,6 +40,7 @@
 #   error "Synocracy needs CZMQ/2.0.0 or later"
 #endif
 
+#include "mongoose.h"
 #include "myp_mystatefulmod.h"
 #include "myp_mystatelessmod.h"
 
