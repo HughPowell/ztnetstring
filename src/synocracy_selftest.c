@@ -39,6 +39,7 @@ int main (int argc, char *argv [])
         printf ("Running self tests...\n");
         myp_mystatefulmod_test (verbose);
         myp_mystatelessmod_test (verbose);
+        syn_tnetstr_test (verbose);
         printf ("Tests passed OK\n");
         return 0;
     //}
