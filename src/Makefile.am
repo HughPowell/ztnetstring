@@ -5,15 +5,9 @@ pkgconfig_DATA = libsynocracy.pc
 
 include_HEADERS = \
     ../include/synocracy.h \
-    ../include/myp_mystatefulmod.h \
-    ../include/myp_mystatelessmod.h \
-    ../include/mongoose.h \
     ../include/syn_tnetstr.h
 
 libsynocracy_la_SOURCES = \
-    myp_mystatefulmod.c \
-    myp_mystatelessmod.c \
-    mongoose.c \
     syn_tnetstr.c
 
 INCLUDES = -I$(top_srcdir)/include
