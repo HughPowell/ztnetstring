@@ -1,4 +1,4 @@
-MAN1 = synocracy.1
+MAN1 = ztnetstr.1
 MAN3 = 
 MAN7 = 
 MAN_DOC = $(MAN1) $(MAN3) $(MAN7)
@@ -23,7 +23,7 @@ SUFFIXES=.txt .xml .1 .3 .7
 .txt.xml:
 	$(srcdir)/mkman $<
 	asciidoc -d manpage -b docbook -f  $(srcdir)/asciidoc.conf \
-		-asynocracy_version=@PACKAGE_VERSION@ -o$@ $<
+		-aztnetstr_version=@PACKAGE_VERSION@ -o$@ $<
 .xml.1:
 	xmlto man $<
 .xml.3:

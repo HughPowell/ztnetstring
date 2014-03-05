@@ -1,5 +1,5 @@
-git clone git://github.com/HughPowell/synocracy.git
-cd synocracy
+git clone git://github.com/HughPowell/ztnetstr.git
+cd ztnetstr
 ./autogen.sh
 ./configure
 ./make

@@ -1,7 +1,7 @@
 #!/bin/sh
 #   Copyright (c) 1991-2012 iMatix Corporation and contributors
 #
-#   This file is part of the Synocracy project.
+#   This file is part of the ztnetstring project.
 #
 #   This is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by

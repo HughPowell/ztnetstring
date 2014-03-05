@@ -1,10 +1,10 @@
 /*  =========================================================================
-    synocracy_selftest - run self tests
+    ztnetstr_selftest - run self tests
 
     -------------------------------------------------------------------------
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of Synocracy, see http://www.synocracy.org.
+    This file is part of ztnetstring, see http://github.com/HughPowell/ztnetstring.
 
     This is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by the
@@ -37,7 +37,7 @@ int main (int argc, char *argv [])
     //  Do normal checks if run without arguments
     //if (argc < 2) {
         printf ("Running self tests...\n");
-        syn_tnetstr_test (verbose);
+        ztns_test (verbose);
         printf ("Tests passed OK\n");
         return 0;
     //}

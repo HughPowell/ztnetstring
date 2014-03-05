@@ -1,24 +1,24 @@
-lib_LTLIBRARIES = libsynocracy.la
+lib_LTLIBRARIES = libztnetstr.la
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libsynocracy.pc
+pkgconfig_DATA = libztnetstr.pc
 
 include_HEADERS = \
     ../include/ztnetstr.h \
     ../include/ztns_impl.h
 
-libsynocracy_la_SOURCES = \
+libztnetstr_la_SOURCES = \
     ztns_impl.c
 
 INCLUDES = -I$(top_srcdir)/include
 bin_PROGRAMS = ztnetstr ztnetstr_selftest
-ztnetstr_selftest_LDADD = libsynocracy.la
-ztnetstr_LDADD = libsynocracy.la
+ztnetstr_selftest_LDADD = libztnetstr.la
+ztnetstr_LDADD = libztnetstr.la
 
 if ON_MINGW
-libsynocracy_la_LDFLAGS = -no-undefined -avoid-version -version-info @LTVER@
+libztnetstr_la_LDFLAGS = -no-undefined -avoid-version -version-info @LTVER@
 else
-libsynocracy_la_LDFLAGS = -version-info @LTVER@
+libztnetstr_la_LDFLAGS = -version-info @LTVER@
 endif
 
 TESTS = ztnetstr_selftest

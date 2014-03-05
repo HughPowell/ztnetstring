@@ -20,7 +20,7 @@ static const uint MAX_TNETSTR_SIZE_LENGTH  = 9;
 static const uint COLON_LENGTH = 1;
 static const uint TYPE_CHAR_LENGTH = 1;
 
-struct _syn_tnetstr_t
+struct _ztns_t
 {
     char * data;
     uint size;
@@ -28,10 +28,10 @@ struct _syn_tnetstr_t
     uint growth_factor;
 };
 
-syn_tnetstr_t *
-syn_tnetstr_new ()
+ztns_t *
+ztns_new ()
 {
-    syn_tnetstr_t *self = (syn_tnetstr_t *)malloc (sizeof (syn_tnetstr_t));
+    ztns_t *self = (ztns_t *)malloc (sizeof (ztns_t));
     assert (self);
     if (!self)
         return NULL;
@@ -43,10 +43,10 @@ syn_tnetstr_new ()
 }
 
 void
-syn_tnetstr_destroy (syn_tnetstr_t **p_self)
+ztns_destroy (ztns_t **p_self)
 {
     assert (p_self);
-    syn_tnetstr_t *self = *p_self;
+    ztns_t *self = *p_self;
     if (!self)
         return;
     if (self->data) {
@@ -58,7 +58,7 @@ syn_tnetstr_destroy (syn_tnetstr_t **p_self)
 }
 
 int
-s_append (syn_tnetstr_t *self, const char *data, const char type)
+s_append (ztns_t *self, const char *data, const char type)
 {
     assert (self);
     
@@ -97,13 +97,13 @@ s_append (syn_tnetstr_t *self, const char *data, const char type)
 }
 
 int
-syn_tnetstr_append_str (syn_tnetstr_t *self, const char *data)
+ztns_append_str (ztns_t *self, const char *data)
 {
     return s_append (self, data, ',');
 }
 
 int
-syn_tnetstr_append_llong (syn_tnetstr_t *self, long long data)
+ztns_append_llong (ztns_t *self, long long data)
 {
     uint str_len = s_get_str_len (data);
     char data_str[str_len + NULL_LENGTH];
@@ -115,7 +115,7 @@ syn_tnetstr_append_llong (syn_tnetstr_t *self, long long data)
 }
 
 int
-syn_tnetstr_append_float (syn_tnetstr_t *self, float data)
+ztns_append_float (ztns_t *self, float data)
 {
     const uint MAX_FLOAT_CHARS = strlen("-0.") + FLT_MANT_DIG - FLT_MIN_EXP;
     char data_str[MAX_FLOAT_CHARS + NULL_LENGTH];
@@ -127,7 +127,7 @@ syn_tnetstr_append_float (syn_tnetstr_t *self, float data)
 }
 
 int
-syn_tnetstr_append_bool (syn_tnetstr_t *self, bool data)
+ztns_append_bool (ztns_t *self, bool data)
 {
     if (data)
         return s_append (self, "true", '!');
@@ -135,14 +135,14 @@ syn_tnetstr_append_bool (syn_tnetstr_t *self, bool data)
 }
 
 int
-syn_tnetstr_append_null (syn_tnetstr_t *self)
+ztns_append_null (ztns_t *self)
 {
     return s_append (self, NULL, '~');
 }
 
 typedef struct {
-    syn_tnetstr_t *self;
-    syn_tnetstr_dict_foreach_fn *fn;
+    ztns_t *self;
+    ztns_dict_foreach_fn *fn;
 } _foreach_args;
 
 int
@@ -153,9 +153,9 @@ s_zhash_foreach_fn (const char *key, void *item, void *argument)
 }
 
 int
-syn_tnetstr_append_dict (syn_tnetstr_t *self, zhash_t *data, syn_tnetstr_dict_foreach_fn *fn)
+ztns_append_dict (ztns_t *self, zhash_t *data, ztns_dict_foreach_fn *fn)
 {
-    syn_tnetstr_t *items = syn_tnetstr_new ();
+    ztns_t *items = ztns_new ();
     assert (items);
     if (!items)
         return -1;
@@ -165,18 +165,18 @@ syn_tnetstr_append_dict (syn_tnetstr_t *self, zhash_t *data, syn_tnetstr_dict_fo
     int rc = zhash_foreach (data, &s_zhash_foreach_fn, &arguments);
     assert (0 == rc);
     if (0 != rc) {
-        syn_tnetstr_destroy (&items);
+        ztns_destroy (&items);
         return -1;
     }
     rc = s_append (self, items->data, '}');
-    syn_tnetstr_destroy (&items);
+    ztns_destroy (&items);
     return rc;
 }
 
 int
-syn_tnetstr_append_list (syn_tnetstr_t *self, zlist_t *data, syn_tnetstr_list_foreach_fn *fn)
+ztns_append_list (ztns_t *self, zlist_t *data, ztns_list_foreach_fn *fn)
 {
-    syn_tnetstr_t *items = syn_tnetstr_new ();
+    ztns_t *items = ztns_new ();
     assert (items);
     if (!items)
         return -1;
@@ -184,18 +184,18 @@ syn_tnetstr_append_list (syn_tnetstr_t *self, zlist_t *data, syn_tnetstr_list_fo
     while (item) {
         int rc = fn (items, item);
         if (0 != rc) {
-            syn_tnetstr_destroy (&items);
+            ztns_destroy (&items);
             return rc;
         }
         item = zlist_next (data);
     }
     int rc = s_append (self, items->data, ']');
-    syn_tnetstr_destroy (&items);
+    ztns_destroy (&items);
     return rc;
 }
 
 char *
-syn_tnetstr_get (syn_tnetstr_t *self)
+ztns_get (ztns_t *self)
 {
     return self->data;
 }
@@ -215,7 +215,7 @@ s_free_dict (void *data)
 }
 
 void *
-syn_tnetstr_parse (char **p_tnetstr)
+ztns_parse (char **p_tnetstr)
 {
     assert (p_tnetstr);
     if (NULL == p_tnetstr)
@@ -324,13 +324,13 @@ syn_tnetstr_parse (char **p_tnetstr)
                 return NULL;
             }
 
-            char * key = syn_tnetstr_parse (&index);
+            char * key = ztns_parse (&index);
             if (!key) {
                 zhash_destroy (&dict);
                 return NULL;
             }
 
-            void * item = syn_tnetstr_parse (&index);
+            void * item = ztns_parse (&index);
             if (!item) {
                 zhash_destroy (&dict);
                 return NULL;
@@ -381,7 +381,7 @@ syn_tnetstr_parse (char **p_tnetstr)
                 return NULL;
             }
 
-            void * item = syn_tnetstr_parse (&index);
+            void * item = ztns_parse (&index);
             int rc = zlist_append (list, item);
 
             // Apply the correct free function
@@ -424,55 +424,55 @@ syn_tnetstr_parse (char **p_tnetstr)
 }
 
 int
-s_tnetstr_dict_fn (syn_tnetstr_t *self, const char *key, void *item)
+s_tnetstr_dict_fn (ztns_t *self, const char *key, void *item)
 {
     // Do nothing
     return 0;
 }
 
 int
-s_tnetstr_list_fn (syn_tnetstr_t *self, void *item)
+s_tnetstr_list_fn (ztns_t *self, void *item)
 {
     // Do nothing
     return 0;
 }
 
 int
-s_tnetstr_foreach_dict_fn_test (syn_tnetstr_t *self, const char *key, void *item)
+s_tnetstr_foreach_dict_fn_test (ztns_t *self, const char *key, void *item)
 {
-    int rc = syn_tnetstr_append_str (self, (char *)key);
+    int rc = ztns_append_str (self, (char *)key);
     assert (0 == rc);
     if (0 != rc)
         return rc;
     if (streq (key, "STRING"))
-        return syn_tnetstr_append_str (self, (char *)item);
+        return ztns_append_str (self, (char *)item);
     if (streq (key, "INTEGER"))
-        return syn_tnetstr_append_llong (self, *(long long *)item);
+        return ztns_append_llong (self, *(long long *)item);
     if (streq (key, "BOOLEAN"))
-        return syn_tnetstr_append_bool (self, *(bool *)item);
+        return ztns_append_bool (self, *(bool *)item);
     if (streq (key, "HASH"))
-        return syn_tnetstr_append_dict (self, (zhash_t *)item, &s_tnetstr_dict_fn);
+        return ztns_append_dict (self, (zhash_t *)item, &s_tnetstr_dict_fn);
     if (streq (key, "LIST"))
-        return syn_tnetstr_append_list (self, (zlist_t *)item, &s_tnetstr_list_fn);
+        return ztns_append_list (self, (zlist_t *)item, &s_tnetstr_list_fn);
     return -1;
 }
 
 uint s_list_index = 0;
 
 int
-s_tnetstr_foreach_list_fn_test (syn_tnetstr_t *self, void *item)
+s_tnetstr_foreach_list_fn_test (ztns_t *self, void *item)
 {
     uint list_index = s_list_index++;
     if (0 == list_index)
-        return syn_tnetstr_append_str (self, (char *)item);
+        return ztns_append_str (self, (char *)item);
     if (1 == list_index)
-        return syn_tnetstr_append_llong (self, *(long long *)item);
+        return ztns_append_llong (self, *(long long *)item);
     if (2 == list_index)
-        return syn_tnetstr_append_bool (self, *(bool *)item);
+        return ztns_append_bool (self, *(bool *)item);
     if (3 == list_index)
-        return syn_tnetstr_append_dict (self, (zhash_t *)item, &s_tnetstr_dict_fn);
+        return ztns_append_dict (self, (zhash_t *)item, &s_tnetstr_dict_fn);
     if (4 == list_index)
-        return syn_tnetstr_append_list (self, (zlist_t *)item, &s_tnetstr_list_fn);
+        return ztns_append_list (self, (zlist_t *)item, &s_tnetstr_list_fn);
     return -1;
 
 }
@@ -492,138 +492,138 @@ s_zlist_free_fn (void *data) {
 // --------------------------------------
 // Runs selftest of class
 
-void syn_tnetstr_test (bool verbose) {
-    printf (" * syn_tnetstr: ");
+void ztns_test (bool verbose) {
+    printf (" * ztns: ");
 
     // Strings
-    syn_tnetstr_t *tnetstr = syn_tnetstr_new ();
+    ztns_t *tnetstr = ztns_new ();
     char *data_str = "Hello World!";
     char *tnetstr_str = "12:Hello World!,";
-    int rc = syn_tnetstr_append_str (tnetstr, data_str);
+    int rc = ztns_append_str (tnetstr, data_str);
     assert (0 == rc);
-    assert (streq (syn_tnetstr_get (tnetstr), tnetstr_str));
+    assert (streq (ztns_get (tnetstr), tnetstr_str));
     char * index = tnetstr_str;
-    char *result_str = (char *)syn_tnetstr_parse (&index);
+    char *result_str = (char *)ztns_parse (&index);
     assert (streq (index, ""));
     assert (streq (result_str, data_str));
     free (result_str);
-    syn_tnetstr_destroy (&tnetstr);
+    ztns_destroy (&tnetstr);
 
-    tnetstr = syn_tnetstr_new ();
+    tnetstr = ztns_new ();
     char *data_empty_str = "";
     char *tnetstr_empty_str = "0:,";
-    rc = syn_tnetstr_append_str (tnetstr, data_empty_str);
+    rc = ztns_append_str (tnetstr, data_empty_str);
     assert (0 == rc);
-    assert (streq (syn_tnetstr_get (tnetstr), tnetstr_empty_str));
+    assert (streq (ztns_get (tnetstr), tnetstr_empty_str));
     index = tnetstr_empty_str;
-    result_str = (char *)syn_tnetstr_parse (&index);
+    result_str = (char *)ztns_parse (&index);
     assert (streq (index, ""));
     assert (streq (result_str, data_empty_str));
     free (result_str);
-    syn_tnetstr_destroy (&tnetstr);
+    ztns_destroy (&tnetstr);
 
-    tnetstr = syn_tnetstr_new ();
+    tnetstr = ztns_new ();
     char *data_tnet_str = "12:Hello World!,";
     tnetstr_str = "16:12:Hello World!,,";
-    rc = syn_tnetstr_append_str (tnetstr, data_tnet_str);
+    rc = ztns_append_str (tnetstr, data_tnet_str);
     assert (0 == rc);
-    assert (streq (syn_tnetstr_get (tnetstr), tnetstr_str));
+    assert (streq (ztns_get (tnetstr), tnetstr_str));
     index = tnetstr_str;
-    result_str = (char *)syn_tnetstr_parse (&index);
+    result_str = (char *)ztns_parse (&index);
     assert (streq (index, ""));
     assert (streq (result_str, data_tnet_str));
     free (result_str);
-    syn_tnetstr_destroy (&tnetstr);
+    ztns_destroy (&tnetstr);
 
     // Numbers
-    tnetstr = syn_tnetstr_new ();
+    tnetstr = ztns_new ();
     long long data_llong = 34;
     char *tnetstr_llong = "2:34#";
-    rc = syn_tnetstr_append_llong (tnetstr, data_llong);
+    rc = ztns_append_llong (tnetstr, data_llong);
     assert (0 == rc);
-    assert (streq (syn_tnetstr_get (tnetstr), tnetstr_llong));
+    assert (streq (ztns_get (tnetstr), tnetstr_llong));
     index = tnetstr_llong;
-    long long *result_llong = (long long *)syn_tnetstr_parse (&index);
+    long long *result_llong = (long long *)ztns_parse (&index);
     assert (streq (index, ""));
     assert (data_llong == *result_llong);
     free (result_llong);
-    syn_tnetstr_destroy (&tnetstr);
+    ztns_destroy (&tnetstr);
 
-    tnetstr = syn_tnetstr_new ();
-    rc = syn_tnetstr_append_llong (tnetstr, LLONG_MAX);
+    tnetstr = ztns_new ();
+    rc = ztns_append_llong (tnetstr, LLONG_MAX);
     assert (0 == rc);
-    index = syn_tnetstr_get (tnetstr);
-    result_llong = (long long *)syn_tnetstr_parse (&index);
+    index = ztns_get (tnetstr);
+    result_llong = (long long *)ztns_parse (&index);
     assert (streq (index, ""));
     assert (LLONG_MAX == *result_llong);
     free (result_llong);
-    syn_tnetstr_destroy (&tnetstr);
+    ztns_destroy (&tnetstr);
 
-    tnetstr = syn_tnetstr_new ();
-    rc = syn_tnetstr_append_llong (tnetstr, LLONG_MIN);
+    tnetstr = ztns_new ();
+    rc = ztns_append_llong (tnetstr, LLONG_MIN);
     assert (0 == rc);
-    index = syn_tnetstr_get (tnetstr);
-    result_llong = (long long *)syn_tnetstr_parse (&index);
+    index = ztns_get (tnetstr);
+    result_llong = (long long *)ztns_parse (&index);
     assert (streq (index, ""));
     assert (LLONG_MIN == *result_llong);
     free (result_llong);
-    syn_tnetstr_destroy (&tnetstr);
+    ztns_destroy (&tnetstr);
 
     char *tnetstr_llong_max_plus_one = "19:9223372036854775808#";
     index = tnetstr_llong_max_plus_one;
-    result_llong = (long long *)syn_tnetstr_parse (&index);
+    result_llong = (long long *)ztns_parse (&index);
     assert (NULL == result_llong);
 
     char *tnetstr_llong_min_minus_one = "20:-9223372036854775809#";
     index = tnetstr_llong_min_minus_one;
-    result_llong = (long long *)syn_tnetstr_parse (&index);
+    result_llong = (long long *)ztns_parse (&index);
     assert (NULL == result_llong);
 
     char *tnetstr_float_not_llong = "8:15.75331#";
     index = tnetstr_float_not_llong;
-    result_llong = (long long *)syn_tnetstr_parse (&index);
+    result_llong = (long long *)ztns_parse (&index);
     assert (NULL == result_llong);
 
     // Floats
     // ### These are a bastard to test and until there's a real use
     // I've got better things to do with my time
-    //tnetstr = syn_tnetstr_new ();
+    //tnetstr = ztns_new ();
     //float data_float = 15.75331;
     //char *tnetstr_float = "8:15.75331^";
-    //rc = syn_tnetstr_append_float (tnetstr, data_float);
+    //rc = ztns_append_float (tnetstr, data_float);
     //assert (0 == rc);
-    //assert (streq (syn_tnetstr_get (tnetstr), tnetstr_float));
+    //assert (streq (ztns_get (tnetstr), tnetstr_float));
     //index = tnetstr_float;
-    //float *result_float = (float *)syn_tnetstr_parse (&index);
+    //float *result_float = (float *)ztns_parse (&index);
     //assert (streq (index, ""));
     //assert (data_float == *result_float);
     //free (result_float);
-    //syn_tnetstr_destroy (&tnetstr);
+    //ztns_destroy (&tnetstr);
 
     // Booleans
-    tnetstr = syn_tnetstr_new ();
+    tnetstr = ztns_new ();
     bool data_bool = true;
     char *tnetstr_bool = "4:true!";
-    rc = syn_tnetstr_append_bool (tnetstr, data_bool);
+    rc = ztns_append_bool (tnetstr, data_bool);
     assert (0 == rc);
-    assert (streq (syn_tnetstr_get (tnetstr), tnetstr_bool));
+    assert (streq (ztns_get (tnetstr), tnetstr_bool));
     index = tnetstr_bool;
-    bool *result_bool = (bool *)syn_tnetstr_parse (&index);
+    bool *result_bool = (bool *)ztns_parse (&index);
     assert (streq (index, ""));
     assert (data_bool == *result_bool);
     free (result_bool);
-    syn_tnetstr_destroy (&tnetstr);
+    ztns_destroy (&tnetstr);
 
     // NULL
-    tnetstr = syn_tnetstr_new ();
+    tnetstr = ztns_new ();
     char *tnetstr_null = "0:~";
-    rc = syn_tnetstr_append_null (tnetstr);
-    assert (streq (syn_tnetstr_get (tnetstr), tnetstr_null));
+    rc = ztns_append_null (tnetstr);
+    assert (streq (ztns_get (tnetstr), tnetstr_null));
     index = tnetstr_null;
-    void *result_null = syn_tnetstr_parse (&index);
+    void *result_null = ztns_parse (&index);
     assert (streq (index, ""));
     assert (NULL == result_null);
-    syn_tnetstr_destroy (&tnetstr);
+    ztns_destroy (&tnetstr);
 
     // Dictionaries
     zhash_t *dict = zhash_new ();
@@ -637,12 +637,12 @@ void syn_tnetstr_test (bool verbose) {
     zhash_insert (dict, "LIST", empty_list);
     zhash_freefn (dict, "LIST", &s_zlist_free_fn);
 
-    tnetstr = syn_tnetstr_new ();
-    rc = syn_tnetstr_append_dict (tnetstr, dict, &s_tnetstr_foreach_dict_fn_test);
+    tnetstr = ztns_new ();
+    rc = ztns_append_dict (tnetstr, dict, &s_tnetstr_foreach_dict_fn_test);
     assert (0 == rc);
     zhash_destroy (&dict);
-    index = syn_tnetstr_get (tnetstr);
-    zhash_t *result_dict = (zhash_t *)syn_tnetstr_parse (&index);
+    index = ztns_get (tnetstr);
+    zhash_t *result_dict = (zhash_t *)ztns_parse (&index);
     assert (streq (index, ""));
     assert (NULL != result_dict);
     zhash_autofree (result_dict);
@@ -657,7 +657,7 @@ void syn_tnetstr_test (bool verbose) {
     zlist_t *item_list = (zlist_t *)zhash_lookup (result_dict, "LIST");
     assert (0 == zlist_size (item_list));
     zhash_destroy (&result_dict);
-    syn_tnetstr_destroy (&tnetstr);
+    ztns_destroy (&tnetstr);
 
     // Lists
     zlist_t *list = zlist_new ();
@@ -671,12 +671,12 @@ void syn_tnetstr_test (bool verbose) {
     zlist_append (list, empty_list);
     zlist_freefn (list, empty_list, &s_zlist_free_fn, true);
 
-    tnetstr = syn_tnetstr_new ();
-    rc = syn_tnetstr_append_list (tnetstr, list, &s_tnetstr_foreach_list_fn_test);
+    tnetstr = ztns_new ();
+    rc = ztns_append_list (tnetstr, list, &s_tnetstr_foreach_list_fn_test);
     assert (0 == rc);
     zlist_destroy (&list);
-    index = syn_tnetstr_get (tnetstr);
-    zlist_t *result_list = (zlist_t *)syn_tnetstr_parse (&index);
+    index = ztns_get (tnetstr);
+    zlist_t *result_list = (zlist_t *)ztns_parse (&index);
     assert (streq (index, ""));
     assert (NULL != result_list);
     item_str = (char *)zlist_pop (result_list);
@@ -695,7 +695,7 @@ void syn_tnetstr_test (bool verbose) {
     assert (0 == zlist_size (item_list));
     zlist_destroy (&item_list);
     zlist_destroy (&result_list);
-    syn_tnetstr_destroy (&tnetstr);
+    ztns_destroy (&tnetstr);
 
     printf ("OK\n");
 }

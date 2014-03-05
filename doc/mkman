@@ -71,7 +71,7 @@ pull $top_srcdir/src/$class.c\@selftest
 
 SEE ALSO
 --------
-linksynocracy:synocracy[1]
+linkztnetstr:ztnetstr[1]
 END
 
 #   Now process template

@@ -1,10 +1,10 @@
 /*  =========================================================================
-    synocracy.h - Synocracy library
+    ztnetstr.h - ztnetstring library
 
     -------------------------------------------------------------------------
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of Synocracy, see http://www.synocracy.org.
+    This file is part of ztnetstring, see http://github.com/HughPowell/ztnetstring.
 
     This is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by the
@@ -21,25 +21,25 @@
     =========================================================================
 */
 
-#ifndef __SYNOCRACY_H_INCLUDED__
-#define __SYNOCRACY_H_INCLUDED__
+#ifndef __ZTNETSTR_H_INCLUDED__
+#define __ZTNETSTR_H_INCLUDED__
 
-//  SYNOCRACY version macros for compile-time API detection
+//  ZTNETSTR version macros for compile-time API detection
 
-#define SYNOCRACY_VERSION_MAJOR 1
-#define SYNOCRACY_VERSION_MINOR 0
-#define SYNOCRACY_VERSION_PATCH 0
+#define ZTNETSTR_VERSION_MAJOR 1
+#define ZTNETSTR_VERSION_MINOR 0
+#define ZTNETSTR_VERSION_PATCH 0
 
-#define SYNOCRACY_MAKE_VERSION(major, minor, patch) \
+#define ZTNETSTR_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))
-#define SYNOCRACY_VERSION \
-    SYNOCRACY_MAKE_VERSION(SYNOCRACY_VERSION_MAJOR, SYNOCRACY_VERSION_MINOR, SYNOCRACY_VERSION_PATCH)
+#define ZTNETSTR_VERSION \
+    ZTNETSTR_MAKE_VERSION(ZTNETSTR_VERSION_MAJOR, ZTNETSTR_VERSION_MINOR, ZTNETSTR_VERSION_PATCH)
 
 #include <czmq.h>
 #if CZMQ_VERSION < 20000
-#   error "Synocracy needs CZMQ/2.0.0 or later"
+#   error "ztnetstring needs CZMQ/2.0.0 or later"
 #endif
 
-#include "syn_tnetstr.h"
+#include "ztns_impl.h"
 
 #endif
