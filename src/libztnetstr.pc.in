@@ -3,9 +3,9 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: libsynocracy
-Description: Synocracy implementation in C
+Name: libztnetstr
+Description: ztnetstring implementation in C
 Version: @VERSION@
 Requires: libczmq
-Libs: -L${libdir} -lsynocracy
+Libs: -L${libdir} -lztnetstr
 Cflags: -I${includedir}
