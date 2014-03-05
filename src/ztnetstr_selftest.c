@@ -1,5 +1,5 @@
-/* =========================================================================
-    synocracy - Synocracy command-line service
+/*  =========================================================================
+    synocracy_selftest - run self tests
 
     -------------------------------------------------------------------------
     Copyright other contributors as noted in the AUTHORS file.
@@ -17,24 +17,30 @@
     Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with this program. If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see http://www.gnu.org/licenses/.
     =========================================================================
 */
 
 #include "czmq.h"
-#include "../include/synocracy.h"
-
-#define PRODUCT "Synocracy service/1.0"
-#define COPYRIGHT "Copyright (c) 2014 Hugh Powell"
-#define NOWARRANTY \
-"This is free software; see the source for copying conditions. There is NO\n" \
-"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+#include "../include/ztnetstr.h"
 
 int main (int argc, char *argv [])
 {
-    puts (PRODUCT);
-    puts (COPYRIGHT);
-    puts (NOWARRANTY);
+    bool verbose;
+    if (argc == 2 && streq (argv [1], "-v")) {
+        argc--;
+        verbose = true;
+    }
+    else
+        verbose = false;
+
+    //  Do normal checks if run without arguments
+    //if (argc < 2) {
+        printf ("Running self tests...\n");
+        syn_tnetstr_test (verbose);
+        printf ("Tests passed OK\n");
+        return 0;
+    //}
 
     return 0;
 }

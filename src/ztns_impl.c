@@ -1,5 +1,5 @@
 #include <czmq.h>
-#include "../include/synocracy.h"
+#include "../include/ztnetstr.h"
 
 static const uint NULL_LENGTH = 1;
 
